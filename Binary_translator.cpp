@@ -25,7 +25,9 @@ int idiv_func(char* x86_commands, int& cur_position);
 
 int fill_abs_addresses(int* source_code, int* abs_addresses, int code_size);
 
-int jmp_func(char* x86_commands, int& cur_position, int dest_command, int* abs_addresses, int cur_command);
+int jmp_func(char* x86_commands, int& cur_position, int dest_command, int* abs_addresses, int cur_command, int jump_code);
+
+int cmp_func(char* x86_commands, int& cur_position);
 
 
 char const AX_CODE = 0;
@@ -79,7 +81,12 @@ char imul_rdi_rsi[4] = { 0x48, 0x0f, 0xaf, 0xfe };
 char imul_rsi[3] = { 0x48, 0xf7, 0xfe };
 
 char jmp = 0xe9;
+char ja[2] = { 0x0f, 0x87 };
+char jb[2] = { 0x0f, 0x82 };
+char je[2] = { 0x0f, 0x84 };
 
+char cmp_reg[2] = { 0x48, 0x39 };
+char cmp_rsi_rdi = { 0xfe };
 
 int main()
 {
@@ -132,7 +139,7 @@ int fill_abs_addresses(int* source_code, int* abs_addresses, int code_size)
 			++cur_command;
 		}
 
-		else if (source_code[cur_command] == CMD_JMP)
+		else if (CMD_JMP <= source_code[cur_command] && source_code[cur_command] <= CMD_JE)
 		{
 			address += commands_size_in_bytes[source_code[cur_command]];
 			
@@ -212,7 +219,22 @@ int commands_switch(int code_size, int* source_code, char* x86_commands, int* ab
 			break;
 
 		case (CMD_JMP):
-			jmp_func(x86_commands, cur_position, source_code[i + 1], abs_addresses, i);
+			jmp_func(x86_commands, cur_position, source_code[i + 1], abs_addresses, i, CMD_JMP);
+			++i;
+			break;
+
+		case (CMD_JA):
+			jmp_func(x86_commands, cur_position, source_code[i + 1], abs_addresses, i, CMD_JA);
+			++i;
+			break;
+
+		case (CMD_JB):
+			jmp_func(x86_commands, cur_position, source_code[i + 1], abs_addresses, i, CMD_JB);
+			++i;
+			break;
+
+		case (CMD_JE):
+			jmp_func(x86_commands, cur_position, source_code[i + 1], abs_addresses, i, CMD_JE);
 			++i;
 			break;
 		}
@@ -453,22 +475,72 @@ int idiv_func(char* x86_commands, int& cur_position)
 	return 0;
 }
 
-int jmp_func(char* x86_commands, int& cur_position, int dest_command, int* abs_addresses, int cur_command)
+int jmp_func(char* x86_commands, int& cur_position, int dest_command, int* abs_addresses, int cur_command, int jump_code)
 {
 	int abs_dest_address = abs_addresses[dest_command];
 
-	int rel_address = abs_dest_address - abs_addresses[cur_command] - 5;
+	if (jump_code == CMD_JMP)
+	{
+		x86_commands[cur_position] = jmp;
+
+		++cur_position;
+	}
+	else if (jump_code == CMD_JA)
+	{
+		cmp_func(x86_commands, cur_position);
+
+		x86_commands[cur_position] = ja[0];
+		x86_commands[cur_position + 1] = ja[1];
+
+		cur_position += 2;
+	}
+	else if (jump_code == CMD_JB)
+	{
+		cmp_func(x86_commands, cur_position);
+
+		x86_commands[cur_position] = jb[0];
+		x86_commands[cur_position + 1] = jb[1];
+
+		cur_position += 2;
+	}
+	else if (jump_code == CMD_JE)
+	{
+		cmp_func(x86_commands, cur_position);
+
+		x86_commands[cur_position] = je[0];
+		x86_commands[cur_position + 1] = je[1];
+
+		cur_position += 2;
+	}
+
+	int rel_address = abs_dest_address - abs_addresses[cur_command] - commands_size_in_bytes[jump_code];
 
 	const char* rel_address_to_chars = reinterpret_cast <const char*> (&rel_address);
-
-	x86_commands[cur_position] = jmp;
-
-	++cur_position;
 
 	for (int i = 0; i < 4; ++i)
 		x86_commands[cur_position + i] = rel_address_to_chars[i];
 
 	cur_position += 4;
 	
+	return 0;
+}
+
+int cmp_func(char* x86_commands, int& cur_position)
+{
+	pop_to_reg(x86_commands, cur_position, RSI_CODE);
+	pop_to_reg(x86_commands, cur_position, RDI_CODE);
+
+	x86_commands[cur_position] = cmp_reg[0];
+	x86_commands[cur_position + 1] = cmp_reg[1];
+
+	cur_position += 2;
+
+	x86_commands[cur_position] = cmp_rsi_rdi;
+
+	push_reg(x86_commands, cur_position, RDI_CODE);
+	push_reg(x86_commands, cur_position, RSI_CODE);
+
+	++cur_position;
+
 	return 0;
 }
