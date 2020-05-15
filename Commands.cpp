@@ -19,7 +19,7 @@ enum Commands
 	CMD_JMP,
 	CMD_JA,
 	CMD_JB,
-	CMD_JL,
+	CMD_JE,
 	CMD_IN_ax,
 	CMD_IN_bx,
 	CMD_IN_cx,
@@ -76,6 +76,12 @@ int fill_sizes()
 	commands_size_in_bytes[CMD_POP_dx] = 1;
 
 	commands_size_in_bytes[CMD_JMP] = 5;
+
+	commands_size_in_bytes[CMD_JA] = 13;
+
+	commands_size_in_bytes[CMD_JB] = 13;
+
+	commands_size_in_bytes[CMD_JE] = 13;
 
 	return 0;
 }
