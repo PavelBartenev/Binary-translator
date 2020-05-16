@@ -43,7 +43,7 @@ enum Commands
 };
 
 
-int commands_size_in_bytes[30] = {};
+int commands_size_in_bytes[50] = {};
 
 int fill_sizes()
 {
@@ -67,6 +67,8 @@ int fill_sizes()
 
 	commands_size_in_bytes[CMD_PUSH_dx] = 1;
 
+	commands_size_in_bytes[CMD_POP] = 1;
+
 	commands_size_in_bytes[CMD_POP_ax] = 1;
 
 	commands_size_in_bytes[CMD_POP_bx] = 1;
@@ -82,6 +84,28 @@ int fill_sizes()
 	commands_size_in_bytes[CMD_JB] = 13;
 
 	commands_size_in_bytes[CMD_JE] = 13;
+
+	commands_size_in_bytes[CMD_IN_ax] = 89;
+
+	commands_size_in_bytes[CMD_IN_bx] = 89;
+
+	commands_size_in_bytes[CMD_IN_cx] = 89;
+
+	commands_size_in_bytes[CMD_IN_dx] = 89;
+
+	commands_size_in_bytes[CMD_OUT] = 96;
+
+	commands_size_in_bytes[CMD_OUT_ax] = 95;
+
+	commands_size_in_bytes[CMD_OUT_bx] = 95;
+
+	commands_size_in_bytes[CMD_OUT_cx] = 95;
+
+	commands_size_in_bytes[CMD_OUT_dx] = 95;
+
+	commands_size_in_bytes[CMD_CALL] = 10;
+
+	commands_size_in_bytes[CMD_RET] = 3;
 
 	return 0;
 }
