@@ -212,18 +212,10 @@ int add_sub_func(char* x86_commands, int& cur_position, int operation)
 	pop_to_reg(x86_commands, cur_position, RDI_CODE);
 
 	if (operation == CMD_ADD)
-	{
-		for (int i = 0; i < 3; ++i)
-			x86_commands[cur_position + i] = add_rdi_rsi[i];                         //6 bytes
-	}
+		write_instruction(x86_commands, add_rdi_rsi, cur_position, 3);
 
 	else if (operation == CMD_SUB)
-	{
-		for (int i = 0; i < 3; ++i)
-			x86_commands[cur_position + i] = sub_rdi_rsi[i];
-	}
-
-	cur_position += 3;
+		write_instruction(x86_commands, sub_rdi_rsi, cur_position, 3);
 
 	push_reg(x86_commands, cur_position, RDI_CODE);
 
@@ -236,10 +228,7 @@ int imul_func(char* x86_commands, int& cur_position)
 
 	pop_to_reg(x86_commands, cur_position, RDI_CODE);                  //7 bytes
 
-	for (int i = 0; i < 4; ++i)
-		x86_commands[cur_position + i] = imul_rdi_rsi[i];
-
-	cur_position += 4;
+	write_instruction(x86_commands, imul_rdi_rsi, cur_position, 4);
 
 	push_reg(x86_commands, cur_position, RDI_CODE);
 
@@ -248,26 +237,18 @@ int imul_func(char* x86_commands, int& cur_position)
 
 int idiv_func(char* x86_commands, int& cur_position)
 {
-	for (int i = 0; i < 3; ++i)
-		x86_commands[cur_position + i] = mov_rdi_rax[i];
-	
-	cur_position += 3;
+
+	write_instruction(x86_commands, imul_rdi_rax, cur_position, 3);
 
 	pop_to_reg(x86_commands, cur_position, RSI_CODE);
 
 	pop_to_reg(x86_commands, cur_position, AX_CODE);                //12 bytes
 
-	for (int i = 0; i < 3; ++i)
-		x86_commands[cur_position + i] = imul_rsi[i];
-
-	cur_position += 3;
+	write_instruction(x86_commands, imul_rsi, cur_position, 3);
 
 	push_reg(x86_commands, cur_position, AX_CODE);
 	
-	for (int i = 0; i < 3; ++i)
-		x86_commands[cur_position + i] = mov_rax_rdi[i];
-
-	cur_position += 3;
+	write_instruction(x86_commands, mov_rax_rdi, cur_position, 3);
 
 	return 0;
 }
@@ -277,44 +258,22 @@ int jmp_func(char* x86_commands, int& cur_position, int dest_command_index, int*
 	int abs_dest_address = abs_addresses[dest_command_index];
 
 	if (jump_code == CMD_JMP)
-	{
-		x86_commands[cur_position] = jmp[0];
-
-		++cur_position;
-	}
+		write_instruction(x86_commands, jmp, cur_position, 1);
+	
 	else if (jump_code == CMD_JA)
-	{
-
-		x86_commands[cur_position] = ja[0];
-		x86_commands[cur_position + 1] = ja[1];
-
-		cur_position += 2;
-	}
+		write_instruction(x86_commands, ja, cur_position, 2);
+	
 	else if (jump_code == CMD_JB)
-	{
-
-		x86_commands[cur_position] = jb[0];
-		x86_commands[cur_position + 1] = jb[1];
-
-		cur_position += 2;
-	}
+		write_instruction(x86_commands, jb, cur_position, 2);
+	
 	else if (jump_code == CMD_JE)
-	{
-
-		x86_commands[cur_position] = je[0];
-		x86_commands[cur_position + 1] = je[1];
-
-		cur_position += 2;
-	}
+		write_instruction(x86_commands, je, cur_position, 2);
 
 	int rel_address = abs_dest_address - abs_addresses[cur_command_index] - commands_size_in_bytes[jump_code];
 
 	const char* rel_address_to_chars = reinterpret_cast <const char*> (&rel_address);
 
-	for (int i = 0; i < 4; ++i)
-		x86_commands[cur_position + i] = rel_address_to_chars[i];
-
-	cur_position += 4;
+	write_instruction(x86_commands, rel_address_to_chars, cur_position, 4);
 	
 	return 0;
 }
