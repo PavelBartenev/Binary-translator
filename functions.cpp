@@ -71,10 +71,7 @@ int push_num(char* x86_commands, int& cur_position, int number)
 
 		++cur_position;                                                                         
 
-		for (int i = 0; i < 4; ++i)
-			x86_commands[cur_position + i] = number_chars[i];
-
-		cur_position += 4;
+		write_instruction(x86_commands, number_chars, cur_position, 4);
 	}
 
 	return 0;
@@ -128,31 +125,6 @@ int push_reg(char* x86_commands, int& cur_position, char reg_code)
 		cur_position += 2;
 		break;
 	}
-
-	return 0;
-}
-
-int mov_number_to_reg(char* x86_commands, int& cur_position, char reg_code, int number)
-{
-	switch (reg_code)
-	{
-	case (R12_CODE):
-		x86_commands[cur_position]     = mov_to_r12[0];
-		x86_commands[cur_position + 1] = mov_to_r12[1];
-		x86_commands[cur_position + 2] = mov_to_r12[2];                                   
-
-		cur_position += 3;
-		break;
-	}
-
-	int number_to_char = number;
-
-	const char* number_chars = reinterpret_cast <const char*> (&number_to_char);
-
-	for (int i = 0; i < 4; ++i)
-		x86_commands[cur_position + i] = number_chars[i];
-
-	cur_position += 4;
 
 	return 0;
 }
