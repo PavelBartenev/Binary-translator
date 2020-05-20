@@ -85,7 +85,7 @@ int fill_sizes()
 
 	commands_size_in_bytes[CMD_JE] = 13;
 
-	commands_size_in_bytes[CMD_IN_ax] = 89;
+	commands_size_in_bytes[CMD_IN_ax] = 89;//88?
 
 	commands_size_in_bytes[CMD_IN_bx] = 89;
 
@@ -93,19 +93,19 @@ int fill_sizes()
 
 	commands_size_in_bytes[CMD_IN_dx] = 89;
 
-	commands_size_in_bytes[CMD_OUT] = 96;
+	commands_size_in_bytes[CMD_OUT] = 92; //?85
 
-	commands_size_in_bytes[CMD_OUT_ax] = 95;
+	commands_size_in_bytes[CMD_OUT_ax] = 91;
 
-	commands_size_in_bytes[CMD_OUT_bx] = 95;
+	commands_size_in_bytes[CMD_OUT_bx] = 91;
 
-	commands_size_in_bytes[CMD_OUT_cx] = 95;
+	commands_size_in_bytes[CMD_OUT_cx] = 91;
 
-	commands_size_in_bytes[CMD_OUT_dx] = 95;
+	commands_size_in_bytes[CMD_OUT_dx] = 91;
 
-	commands_size_in_bytes[CMD_CALL] = 10;
+	commands_size_in_bytes[CMD_CALL] = 5;
 
-	commands_size_in_bytes[CMD_RET] = 3;
+	commands_size_in_bytes[CMD_RET] = 1;
 
 	return 0;
 }
