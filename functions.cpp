@@ -119,7 +119,7 @@ int push_reg(char* x86_commands, int& cur_position, char reg_code)
 		x86_commands[cur_position + 1] = push_r12[1]; 
 
 		cur_position += 2;	
-		break;                                                         //2 bytes
+		break;                                                        
 
 	case (R14_CODE):
 		x86_commands[cur_position] = push_r14[0];
@@ -128,31 +128,6 @@ int push_reg(char* x86_commands, int& cur_position, char reg_code)
 		cur_position += 2;
 		break;
 	}
-
-	return 0;
-}
-
-int mov_number_to_reg(char* x86_commands, int& cur_position, char reg_code, int number)
-{
-	switch (reg_code)
-	{
-	case (R12_CODE):
-		x86_commands[cur_position]     = mov_to_r12[0];
-		x86_commands[cur_position + 1] = mov_to_r12[1];
-		x86_commands[cur_position + 2] = mov_to_r12[2];                                   
-
-		cur_position += 3;
-		break;
-	}
-
-	int number_to_char = number;
-
-	const char* number_chars = reinterpret_cast <const char*> (&number_to_char);
-
-	for (int i = 0; i < 4; ++i)
-		x86_commands[cur_position + i] = number_chars[i];
-
-	cur_position += 4;
 
 	return 0;
 }
@@ -172,7 +147,7 @@ int pop_to_reg(char* x86_commands, int& cur_position, char reg_code)
 		break;
 
 	case (CX_CODE):
-		x86_commands[cur_position] = pop_cx[0];                           //1 byte
+		x86_commands[cur_position] = pop_cx[0];                           
 		++cur_position;
 		break;
 
