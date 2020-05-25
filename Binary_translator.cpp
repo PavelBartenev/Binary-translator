@@ -6,7 +6,9 @@
 #include "Command_codes.cpp"
 #include "functions.cpp"
 
-const int ret_addresses_buffer = 0x400500;
+const int MAX_PROGRAM_BYTES = 10000;
+
+const int PROGRAM_START = 0x400078;
 
 int commands_switch(int code_size, int* source_code, char* x86_commands, int* abs_addresses);
 
@@ -30,12 +32,12 @@ int main()
 	fill_sizes();
 	fill_abs_addresses(source_code, abs_addresses, code_size);
 
-	char* x86_commands = new char[10000]();
+	char* x86_commands = new char[MAX_PROGRAM_BYTES]();
 
 	int x86_code_size = commands_switch(code_size, source_code, x86_commands, abs_addresses) + 1;
 
 	make_elf_header(elf);
-	make_programm_header(elf, TOTAL_HEADERS_SIZE + x86_code_size); //size = number of bytes in program + 120
+	make_programm_header(elf, TOTAL_HEADERS_SIZE + x86_code_size);
 	elf.write(x86_commands, x86_code_size);
 
 	for (int i = 0; i < code_size; ++i)
@@ -46,7 +48,7 @@ int main()
 
 int fill_abs_addresses(int* source_code, int* abs_addresses, int code_size)
 {
-	int address = 0x400078 + 8;
+	int address = PROGRAM_START + 8;
 
 	for (int cur_command = 0; cur_command < code_size; ++cur_command)
 	{
@@ -208,9 +210,6 @@ int commands_switch(int code_size, int* source_code, char* x86_commands, int* ab
 			break;
 
 		case(CMD_CALL):
-			/*write_instruction(x86_commands, call_num, cur_position, 1, abs_addresses[source_code[cur_command + 1]] - abs_addresses[cur_command + 2]);
-			++cur_command;*/
-
 			write_instruction(x86_commands, mov_qword_r8_num, cur_position, 3, abs_addresses[cur_command + 2]);
 			write_instruction(x86_commands, sub_r8_num, cur_position, 3, 8);
 			jmp_func(x86_commands, cur_position, source_code[cur_command + 1], abs_addresses, cur_command, CMD_CALL);
@@ -219,8 +218,6 @@ int commands_switch(int code_size, int* source_code, char* x86_commands, int* ab
 			break;
 
 		case(CMD_RET):
-			//write_instruction(x86_commands, ret, cur_position, 1);
-
 			write_instruction(x86_commands, add_r8_num, cur_position, 3, 8);
 			write_instruction(x86_commands, mov_rdi_qword_r8, cur_position, 3);
 			write_instruction(x86_commands, jmp_rdi, cur_position, 2);
